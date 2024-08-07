@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* styles.css */
+
+.bg-yellow-200 {
+  background-color: #fefcbf;
+}
+
+.text-red-500 {
+  color: #f56565;
+}
+
+.font-bold {
+  font-weight: bold;
+}
