@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
-import { AlbumContext } from '../context/AlbumContext';
+import { AlbumContext } from '../../context/AlbumContext';
+import './Packet.css';
+
 
 const mapTypeToSection = (type) => {
   if (type === 'films') return 'movies';
@@ -117,7 +119,7 @@ const Packet = () => {
   const allCardsProcessed = cards.every(card => album[mapTypeToSection(card.type)].some(c => c.id === card.id) || !cards.some(c => c.id === card.id));
 
   return (
-    <div className="p-4 bg-gray-100 rounded shadow">
+    <div className="p-4 bg-white rounded shadow-lg">
       <div className="grid grid-cols-2 gap-4 mb-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <button

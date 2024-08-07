@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './DetailView.css';
+
 
 const DetailView = ({ type, id, onClose }) => {
   const [detail, setDetail] = useState(null);
@@ -23,7 +25,7 @@ const DetailView = ({ type, id, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-4 rounded">
+      <div className="bg-white p-4 rounded w-1/2">
         <button onClick={onClose} className="bg-red-500 text-white p-2 rounded mb-4">Close</button>
         <h2 className="text-xl font-bold mb-4">{detail.name || detail.title}</h2>
         <pre className="whitespace-pre-wrap">{JSON.stringify(detail, null, 2)}</pre>

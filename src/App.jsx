@@ -1,23 +1,28 @@
-// App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AlbumProvider from './context/AlbumContext'; // Asegúrate de que la ruta sea correcta
-import Home from './pages/Home';
-import Album from './pages/Album';
-import Menu from './components/Menu';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/Home';
+import Album from './pages/Album/Album';
+import Packet from './components/Packet/Packet';
+import Menu from './components/Menu/Menu';
+import AlbumProvider from './context/AlbumContext';
 
-function App() {
+const App = () => {
   return (
     <AlbumProvider>
       <Router>
-        <Menu />
-        <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route path="/album" element={<Album />} />
-        </Routes>
+        <div className="min-h-screen bg-gray-100 flex flex-col">
+          <Menu />
+          <div className="flex-grow container mx-auto p-4">
+            <Routes>
+              <Route path="/" element={<Album />} />
+              <Route path="/album" element={<Album />} />
+              <Route path="/packet" element={<Packet />} />
+            </Routes>
+          </div>
+        </div>
       </Router>
     </AlbumProvider>
   );
-}
+};
 
 export default App;

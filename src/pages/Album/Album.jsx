@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { AlbumContext } from '../context/AlbumContext';
-import DetailView from '../components/DetailView';
+import { AlbumContext } from '../../context/AlbumContext';
+import DetailView from '../../components/DetailView/DetailView';
+import './Album.css';
 
 const Album = () => {
   const { album } = useContext(AlbumContext);
@@ -15,28 +16,35 @@ const Album = () => {
   };
 
   const renderSection = (sectionName, items, type) => (
-    <div className="mt-10">
-      <h2 className="text-2xl font-semibold">{sectionName}</h2>
-      <ul>
+    <div className="album-section mb-8">
+      <h2 className="text-xl font-semibold mb-4">{sectionName}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {Array.from({ length: type === 'films' ? 6 : type === 'people' ? 82 : 36 }).map((_, index) => {
           const item = items.find(item => parseInt(item.id) === index + 1);
           return (
-            <li
+            <div
               key={`${type}-${index + 1}`}
               onClick={() => item && showCardDetails(type, item.id)}
-              className={`cursor-pointer ${item ? (item.special ? 'text-red-500 font-bold' : 'text-blue-500') : 'text-gray-500'}`}
+              className={`card p-4 border rounded-lg shadow-md cursor-pointer text-center ${item ? (item.special ? 'bg-yellow-200' : 'bg-white') : 'bg-gray-100'}`}
             >
-              {item ? `${index + 1}. ${item.name}` : `${index + 1}`}
-            </li>
+              {item ? (
+                <>
+                  <h3 className="text-lg font-bold">{item.name}</h3>
+                  <p className="text-sm text-gray-600">{item.id}</p>
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">{index + 1}</p>
+              )}
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-4xl font-bold text-center mt-10">Mi Álbum</h1>
+    <div className="album-container p-4">
+      <h1 className="text-2xl font-bold text-center mb-8">Mi Álbum</h1>
       {renderSection('Películas', album.movies, 'films')}
       {renderSection('Personajes', album.characters, 'people')}
       {renderSection('Naves', album.starships, 'starships')}
