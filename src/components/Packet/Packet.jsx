@@ -154,7 +154,7 @@ const Packet = () => {
       </div>
       {cards.length > 0 && (
 				<div className="text-center mx-auto">
-					<button onClick={handleDiscardPacket} className={`mt-4 px-4 py-2 rounded text-white ${!allActionsDefined ? 'bg-starwars-buttonDisabled cursor-not-allowed' : 'bg-starwars-buttonPrimary hover:bg-starwars-secondary'}`} disabled={!allActionsDefined}>
+					<button onClick={handleDiscardPacket} className={`mt-4 px-4 py-2 rounded text-white ${!allActionsDefined ? 'bg-starwars-buttonDisabled cursor-not-allowed' : 'bg-starwars-buttonPrimary hover:bg-red-700 text-white'}`} disabled={!allActionsDefined}>
 						Descartar Sobre
 					</button>
 				</div>
