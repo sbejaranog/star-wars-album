@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Packet from '../components/Packet';
+import './Home.css';
+import Packet from '../../components/Packet/Packet';
 
 const Home = () => {
   return (
