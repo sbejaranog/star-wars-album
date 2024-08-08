@@ -3,40 +3,50 @@ import React, { createContext, useState, useEffect } from 'react';
 export const AlbumContext = createContext();
 
 const AlbumProvider = ({ children }) => {
-  const [album, setAlbum] = useState({
-    movies: [],
-    characters: [],
-    starships: []
-  });
+  const [album, setAlbum] = useState({ movies: [], characters: [], starships: [] });
   const [cards, setCards] = useState([]);
+  const [actions, setActions] = useState({});
   const [timer, setTimer] = useState(0);
-  const [activePacket, setActivePacket] = useState(-1);
 
   useEffect(() => {
-    let interval;
     if (timer > 0) {
-      interval = setInterval(() => {
+      const interval = setInterval(() => {
         setTimer(prevTimer => prevTimer - 1);
       }, 1000);
+      return () => clearInterval(interval);
     }
-    return () => clearInterval(interval);
   }, [timer]);
 
   const addCardToAlbum = (card) => {
-    const section = card.type;
-    setAlbum(prevAlbum => ({
+    setAlbum((prevAlbum) => ({
       ...prevAlbum,
-      [section]: [...prevAlbum[section], card]
+      [card.type]: [...prevAlbum[card.type], card]
     }));
   };
 
-  const resetTimer = () => {
-    setTimer(0);
-    setActivePacket(-1);
+  const updateCards = (newCards) => {
+    setCards(newCards);
+  };
+
+  const updateActions = (newActions) => {
+    setActions(newActions);
+  };
+
+  const resetTimer = (newTimer) => {
+    setTimer(newTimer);
   };
 
   return (
-    <AlbumContext.Provider value={{ album, addCardToAlbum, cards, setCards, timer, setTimer, activePacket, setActivePacket, resetTimer }}>
+    <AlbumContext.Provider value={{
+      album,
+      addCardToAlbum,
+      cards,
+      updateCards,
+      actions,
+      updateActions,
+      timer,
+      resetTimer
+    }}>
       {children}
     </AlbumContext.Provider>
   );

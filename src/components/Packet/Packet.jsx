@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AlbumContext } from '../../context/AlbumContext';
+import Card from '../Card/Card';
 import './Packet.css';
-
 
 const mapTypeToSection = (type) => {
   if (type === 'films') return 'movies';
@@ -27,7 +27,6 @@ const getRandomId = (type) => {
       maxId = 0;
       break;
   }
-
   return maxId ? Math.floor(Math.random() * maxId) + 1 : null;
 };
 
@@ -56,8 +55,9 @@ const fetchResource = async (type, retries = 5) => {
 };
 
 const Packet = () => {
-  const { album, addCardToAlbum, cards, setCards, timer, setTimer, activePacket, setActivePacket, resetTimer } = useContext(AlbumContext);
+  const { album, addCardToAlbum, cards, updateCards, actions, updateActions, timer, resetTimer } = useContext(AlbumContext);
   const [loading, setLoading] = useState(false);
+  const [activePacket, setActivePacket] = useState(-1);
 
   const openPacket = async (packetIndex) => {
     if (timer > 0 || loading || activePacket !== -1) return;
@@ -90,8 +90,9 @@ const Packet = () => {
         type: res.title ? 'films' : res.starship_class ? 'starships' : 'people',
         special: res.episode_id || parseInt(res.url.split('/')[5]) <= 20,
       }));
-      setCards(newCards);
-      setTimer(60);
+      updateCards(newCards);
+      updateActions(newCards.reduce((acc, card) => ({ ...acc, [card.id]: null }), {}));
+      resetTimer(60);
     } catch (error) {
       console.error('Error fetching packet data:', error);
     } finally {
@@ -104,59 +105,58 @@ const Packet = () => {
     const section = mapTypeToSection(card.type);
     if (section) {
       addCardToAlbum({ ...card, type: section });
+      updateActions(prevActions => ({ ...prevActions, [card.id]: 'added' }));
     }
   };
 
   const handleDiscardCard = (card) => {
-    setCards(prevCards => prevCards.filter(c => c.id !== card.id));
+    updateActions(prevActions => ({ ...prevActions, [card.id]: 'discarded' }));
   };
 
   const handleDiscardPacket = () => {
-    setCards([]);
-    resetTimer();
+    updateCards([]);
+    updateActions({});
+    resetTimer(0); // Reset timer
   };
 
-  const allCardsProcessed = cards.every(card => album[mapTypeToSection(card.type)].some(c => c.id === card.id) || !cards.some(c => c.id === card.id));
+  const allActionsDefined = Object.values(actions).every(action => action !== null);
 
   return (
-    <div className="p-4 bg-white rounded shadow-lg">
+    <div className="packet-container p-4">
       <div className="grid grid-cols-2 gap-4 mb-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <button
             key={index}
             onClick={() => openPacket(index)}
-            className="px-4 py-2 bg-green-500 text-white rounded disabled:opacity-50"
+            className={`px-4 py-2 rounded ${timer > 0 || loading || activePacket !== -1 ? 'bg-starwars-buttonDisabled cursor-not-allowed' : 'bg-starwars-buttonSecondary text-white hover:bg-starwars-primary'}`}
             disabled={timer > 0 || loading || activePacket !== -1}
           >
             {loading && activePacket === index ? 'Cargando...' : timer > 0 ? `Bloqueado (${timer}s)` : `Abrir Sobre ${index + 1}`}
           </button>
         ))}
       </div>
-      <div className="mt-4 grid grid-cols-1 gap-4">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {cards.map(card => {
           const section = mapTypeToSection(card.type);
           const isAlreadyInAlbum = album[section].some(c => c.id === card.id);
           return (
-            <div key={`${card.type}-${card.id}`} className={`p-2 border rounded shadow flex justify-between items-center ${card.special ? 'bg-yellow-200' : 'bg-white'}`}>
-              <span className={card.special ? 'text-red-500 font-bold' : ''}>{card.name}</span>
-              {isAlreadyInAlbum ? (
-                <button onClick={() => handleDiscardCard(card)} className="ml-2 px-2 py-1 bg-red-500 text-white rounded">
-                  Descartar
-                </button>
-              ) : (
-                <button onClick={() => handleAddCard(card)} className="ml-2 px-2 py-1 bg-blue-500 text-white rounded">
-                  Agregar al álbum
-                </button>
-              )}
-            </div>
+            <Card
+              key={`${card.type}-${card.id}`}
+              item={card}
+              showActions={true}
+              onAdd={handleAddCard}
+              onDiscard={handleDiscardCard}
+              action={actions[card.id]} // Pass the action state to the card
+              isAlreadyInAlbum={isAlreadyInAlbum} // Pass the state if it's already in the album
+            />
           );
         })}
-        {cards.length > 0 && (
-          <button onClick={handleDiscardPacket} className="mt-4 px-4 py-2 bg-red-500 text-white rounded" disabled={!allCardsProcessed}>
-            Descartar Sobre
-          </button>
-        )}
       </div>
+      {cards.length > 0 && (
+        <button onClick={handleDiscardPacket} className={`mt-4 px-4 py-2 rounded text-white ${!allActionsDefined ? 'bg-starwars-buttonDisabled cursor-not-allowed' : 'bg-starwars-buttonPrimary hover:bg-starwars-secondary'}`} disabled={!allActionsDefined}>
+          Descartar Sobre
+        </button>
+      )}
     </div>
   );
 };
